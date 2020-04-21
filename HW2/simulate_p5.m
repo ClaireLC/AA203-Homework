@@ -10,7 +10,7 @@
 clear all; clc; close all;
 
 animate = true; % change to visualize animation
-noise = false; % change to toggle stochastic disturbance
+noise = true; % change to toggle stochastic disturbance
 
 f = @sim_cartpole;
 dt = 0.1; % we work with discrete time
@@ -69,11 +69,15 @@ for t=1:ep_length
     x(:,t+1) = f(x(:,t), u(:,t), dt) + w;
 end
 
-figure; 
+fig = figure; 
 plot(x');
+legend("x", "theta", "x dot", "theta dot");
+saveas(fig, sprintf("p5_state_noise_%s.png", mat2str(noise)));
 
-figure; 
+fig = figure; 
 plot(u,'--');
+legend("u");
+saveas(fig, sprintf("p5_u_noise_%s.png", mat2str(noise)));
 
 if animate
     for t=1:ep_length
