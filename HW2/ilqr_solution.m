@@ -61,7 +61,7 @@ while norm(u_bar - u_bar_prev) > epsilon
     u_bar_prev = u_bar; % used to check termination condition
     
     for t=1:num_steps
-        u_bar(:,t) = u_bar(:,t) + l(:,t) + L(:,:,t) * (x_bar(:,t)-x_bar_prev(:,t));
+        u_bar(:,t) = u_bar(:,t) + (u_bar(:,t)-u_bar_prev(:,t));
         x_bar(:,t+1) = f(x_bar(:,t),u_bar(:,t),dt);
     end
     
