@@ -33,7 +33,7 @@ R1 = np.array([
                ])
 R = np.array([R0, R1])
 
-H = 10
+H = 4
 
 # Values at each iteration for states NOT BROKEN (s0) and BROKEN (s1)
 # Element (i,j) is value at time i at state j

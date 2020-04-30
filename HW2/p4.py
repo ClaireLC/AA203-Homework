@@ -9,7 +9,7 @@ gamma = 0.95
 
 n = 20
 eye  = np.array([15, 15]) # Location of center of storm
-goal = np.array([9, 9])
+goal = np.array([19, 9])
 
 #n = 5
 #eye  = np.array([4, 4]) # Location of center of storm
@@ -78,11 +78,9 @@ while(delta >= 1e-2):
       delta = np.amax(abs(V - V_prev))
   V_prev = np.copy(V)
 
-eye  = np.array([15, 15]) # Location of center of storm
-goal = np.array([9, 9])
-
 #seaborn.set_palette(seaborn.color_palette("RdYlGn"))
 seaborn.heatmap(V, annot=False, linewidths=0.5, cmap="RdYlGn")
+plt.savefig("p4_heatmap.png")
 
 # Get trajectory given policy A
 start = np.array([9, 19])
