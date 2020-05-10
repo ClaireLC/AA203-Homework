@@ -34,7 +34,7 @@ end
 
 % Plotting
 fprintf('Optimal Final Quantity for the Second Substance = %f\n\n',Fval);
-subplot(131); plot(t,x,'linewidth',3);
+fig = subplot(131); plot(t,x,'linewidth',3);
 title('\textbf{a) First Substance}','interpreter','latex','FontSize',22,'FontWeight','bold');
 xlabel('\boldmath{$t$} \ \textbf{(s)}','interpreter','latex','FontSize',20,'FontWeight','bold');
 ylabel('\boldmath{$x$} \ \textbf{(\%)}','interpreter','latex','FontSize',20,'FontWeight','bold');
@@ -55,3 +55,5 @@ ylabel('\boldmath{$u$}','interpreter','latex','FontSize',20,'FontWeight','bold')
 xlim([-inf inf]);
 ylim([-inf inf]);
 grid on;
+
+saveas(fig, "p5.png")
