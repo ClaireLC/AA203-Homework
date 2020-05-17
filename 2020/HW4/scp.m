@@ -74,9 +74,42 @@ function [x,u] = scp(x_old, u_old, u_lb, u_ub, f, linearize_dynamics, Q,R, Qf, g
     % then, we need to linearize f(x_t,u_t) as f(x_bar,u_bar) + other terms
         % TODO - Please initialize and fill up C,d so that C*x = d
         % represents the linearized equality constraints.
+    % Fill in 4 rows at a time (for state s at each timestep)
+    for t_i = 1:num_steps
+        % Linearized dynamics
+        x_ref = z_old(x_start(t_i) : x_end(t_i));
+        u_ref = z_old(u_start(t_i) : u_end(t_i));
+        [A, B, c] = linearize_dynamics(x_ref, u_ref, dt);
+        
+        % Full dynamics at reference trajectory
+        sdot = (f(x_ref, u_ref, dt) - x_ref) / dt;
+        
+        % Compute noteterm, the term that will go in d vector
+        note_term = dt * sdot - B*u_ref - (A - eye(n))*x_ref;
+        
+        % Fill in 4 rows of d with note_term rows
+        d(x_start(t_i):x_end(t_i)) = note_term;
+        
+        assignin('base','sdot',sdot)
+        assignin('base','note_term',note_term);
+       
+        % Fill in 4 rows of C with corresponding coefficients for s_t,
+        % s_t+1, and u_t
+        C(x_start(t_i):x_end(t_i),x_start(t_i):x_end(t_i)) = -A;
+        C(x_start(t_i):x_end(t_i),x_start(t_i+1):x_end(t_i+1)) = eye(n);
+        C(x_start(t_i):x_end(t_i),u_start(t_i):u_end(t_i)) = -B.';
+    end
     % initial condition constraint
         % TODO - Please add the initial codition constraint
-
+        % We need additional rows in C and d for the initial conditions x0
+    % Add n rows to C and d for initial conditions
+    C = [C ; zeros(n,(n+m)*num_steps)];
+    d = [d ; zeros(n, 1)];
+    
+    C(end-3:end,x_start(1):x_end(1)) = eye(n);
+    assignin('base','C',C);
+    assignin('base','d',d);
+    
     %% Build CVX instance of our optimization problem
     cvx_begin quiet
 
@@ -86,7 +119,8 @@ function [x,u] = scp(x_old, u_old, u_lb, u_ub, f, linearize_dynamics, Q,R, Qf, g
         minimize(cost)
         subject to
             % TODO
-            % TODO: Include linearized dynamics constraints C*x <= d.
+            % TODO: Include linearized dynamics constraints 
+            C * z == d;
             lb <= z <= ub; % control effort bounds
             % TODO - Add trust region constraints.
     cvx_end
