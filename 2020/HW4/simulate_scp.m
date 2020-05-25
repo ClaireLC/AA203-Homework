@@ -11,7 +11,7 @@ clear all; clc; close all;
 
 rng(203); % for some consistency!
 
-animate = true; % change to visualize animation
+animate = false; %change to visualize animation
 noise = true; % change to toggle stochastic disturbance
 
 u_lb = -4; %-4
@@ -29,7 +29,7 @@ x_ref = [0; pi; 0; 0];
 u_ref = 0;
 
 clip_val = 150;
-sigma = 0.005;
+sigma = 0.009;
 if noise
     noise_variance = [0;0;sigma^2;sigma^2];
 else
@@ -82,11 +82,15 @@ for t=1:ep_length
     x(:,t+1) = f(x(:,t), u(:,t), dt) + w;
 end
 
-figure; 
+fig = figure; 
 plot(x');
+legend("x", "theta", "x dot", "theta dot");
+saveas(fig, sprintf("p1_state_noise_%s.png", mat2str(noise)));
 
-figure; 
+fig = figure; 
 plot(u,'--');
+legend("u");
+saveas(fig, sprintf("p1_u_noise_%s.png", mat2str(noise)));
 
 if animate
     for t=1:ep_length

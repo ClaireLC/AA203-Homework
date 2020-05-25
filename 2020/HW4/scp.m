@@ -40,6 +40,7 @@ function [x,u] = scp(x_old, u_old, u_lb, u_ub, f, linearize_dynamics, Q,R, Qf, g
     lb(u_shift+1:u_shift+m*num_steps) = u_lb*ones(m*num_steps,1); % set lower bound for control
     ub(u_shift+1:u_shift+m*num_steps) = u_ub*ones(m*num_steps,1); % set upper bound for control
 
+
     % SET THE TARGET STATE FOR z
     % (the optimization will try to minimize a weighted distance from z to z0 subject to constraints
     for i=1:num_steps
@@ -101,14 +102,29 @@ function [x,u] = scp(x_old, u_old, u_lb, u_ub, f, linearize_dynamics, Q,R, Qf, g
     end
     % initial condition constraint
         % TODO - Please add the initial codition constraint
-        % We need additional rows in C and d for the initial conditions x0
-    % Add n rows to C and d for initial conditions
+    % Add additional n rows to C and d for initial conditions x0
     C = [C ; zeros(n,(n+m)*num_steps)];
-    d = [d ; zeros(n, 1)];
+    d = [d ; zeros(n, 1)]; % x0 is all zeros
     
     C(end-3:end,x_start(1):x_end(1)) = eye(n);
     assignin('base','C',C);
     assignin('base','d',d);
+    
+    % Now, we fill in lb and ub with box constraints for s and u
+    eps_trust = 1;
+    for t_i = 1:num_steps
+        x_ref = z_old(x_start(t_i) : x_end(t_i));
+        u_ref = z_old(u_start(t_i) : u_end(t_i));
+        
+        lb(x_start(t_i):x_end(t_i)) = x_ref - eps_trust;
+        ub(x_start(t_i):x_end(t_i)) = x_ref + eps_trust;
+        
+        lb(u_start(t_i):u_end(t_i)) = u_ref - eps_trust;
+        ub(u_start(t_i):u_end(t_i)) = u_ref + eps_trust;
+    end   
+        
+    assignin('base','lb',lb);
+    assignin('base','ub',ub);
     
     %% Build CVX instance of our optimization problem
     cvx_begin quiet
@@ -118,7 +134,6 @@ function [x,u] = scp(x_old, u_old, u_lb, u_ub, f, linearize_dynamics, Q,R, Qf, g
 
         minimize(cost)
         subject to
-            % TODO
             % TODO: Include linearized dynamics constraints 
             C * z == d;
             lb <= z <= ub; % control effort bounds
