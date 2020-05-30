@@ -23,8 +23,8 @@ class dynamics:
         
         self.reset()
 
-        self.m = 4 # State dimension
-        self.n = 2 # Control input dimension
+        self.n = 4 # State dimension
+        self.m = 2 # Control input dimension
     
     def step(self,u):
         xp = self.A @ self.x + self.B @ u
