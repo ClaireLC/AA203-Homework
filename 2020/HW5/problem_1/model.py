@@ -22,6 +22,9 @@ class dynamics:
         self.cov = np.array([0.05, 0.05, 0.025, 0.025])
         
         self.reset()
+
+        self.m = 4 # State dimension
+        self.n = 2 # Control input dimension
     
     def step(self,u):
         xp = self.A @ self.x + self.B @ u
@@ -38,6 +41,23 @@ class dynamics:
         self.x = np.random.randn(4)
         self.x[0:2] *= 5
         return self.x
+  
+    # Riccati recursion
+    def Riccati(self, A,B,Q,R):
+        # TODO implement infinite horizon riccati recursion
+        
+        # Initialize
+        P = Q
+        L_prev = np.zeros((R.shape[0], Q.shape[0]))
+        L = np.linalg.inv(R + B.T @ P @ B) @ (B.T @ P @ A)
+        i = 0
+        while(np.linalg.norm(L_prev - L) > 1e-3):
+          i += 1
+          P = Q + L.T @ R @ L + (A + B @ L).T @ P @ (A + B @ L)
+          L_prev = L
+          L =  np.linalg.inv(R + B.T @ P @ B) @ (B.T @ P @ A)
+         
+        return L,P
 
 class cost:
     
