@@ -49,13 +49,13 @@ class dynamics:
         # Initialize
         P = Q
         L_prev = np.zeros((R.shape[0], Q.shape[0]))
-        L = np.linalg.inv(R + B.T @ P @ B) @ (B.T @ P @ A)
+        L = -np.linalg.inv(R + B.T @ P @ B) @ (B.T @ P @ A)
         i = 0
         while(np.linalg.norm(L_prev - L) > 1e-3):
           i += 1
           P = Q + L.T @ R @ L + (A + B @ L).T @ P @ (A + B @ L)
           L_prev = L
-          L =  np.linalg.inv(R + B.T @ P @ B) @ (B.T @ P @ A)
+          L =  -np.linalg.inv(R + B.T @ P @ B) @ (B.T @ P @ A)
          
         return L,P
 

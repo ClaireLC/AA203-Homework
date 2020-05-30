@@ -13,7 +13,7 @@ N = 100 # number of episodes
 gamma = 0.95 # discount factor
 
 
-plot = False
+plot = True
 
 A = dynfun.A
 B = dynfun.B
@@ -35,7 +35,7 @@ for n in range(N):
     for t in range(T):
         
         # policy 
-        u = (-L @ x)
+        u = (L @ x)
         
         # get reward
         c = costfun.evaluate(x,u)
